@@ -52,11 +52,18 @@ export default function Hero() {
           width: 240,
         },
         ">"
-      );
+      )
+      .to(".hero-title", {
+        left: 0,
+        top: 0,
+        duration: 0.2,
+        ease: "power2.inOut",
+      });
   });
 
   return (
     <div ref={sectionRef} className="h-screen w-screen bg-black relative">
+      <div className="absolute top-0 left-0 w-screen h-screen bg-black/50" />
       <div
         ref={containerRef}
         className="absolute border-2 border-white text-white p-4 bottom-[50%] left-[50%] translate-x-[-50%] translate-y-[50%] w-[340px] h-116 flex flex-col justify-between"

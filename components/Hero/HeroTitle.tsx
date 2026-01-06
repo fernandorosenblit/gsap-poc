@@ -12,7 +12,7 @@ export default function HeroTitle() {
     () => {
       if (!titleRef.current) return;
 
-      const handleMouseEnter = () => {
+      const hoverEnter = () => {
         const tl = gsap.timeline();
 
         // Hide the title-hide elements (animate width and opacity)
@@ -37,7 +37,7 @@ export default function HeroTitle() {
           );
       };
 
-      const handleMouseLeave = () => {
+      const hoverLeave = () => {
         const tl = gsap.timeline();
 
         // First: Move the "ai" span back to its original position
@@ -62,14 +62,14 @@ export default function HeroTitle() {
           );
       };
 
-      titleRef.current.addEventListener("mouseenter", handleMouseEnter);
-      titleRef.current.addEventListener("mouseleave", handleMouseLeave);
+      const element = titleRef.current;
+      element.addEventListener("mouseenter", hoverEnter);
+      element.addEventListener("mouseleave", hoverLeave);
 
+      // Cleanup function
       return () => {
-        if (titleRef.current) {
-          titleRef.current.removeEventListener("mouseenter", handleMouseEnter);
-          titleRef.current.removeEventListener("mouseleave", handleMouseLeave);
-        }
+        element.removeEventListener("mouseenter", hoverEnter);
+        element.removeEventListener("mouseleave", hoverLeave);
       };
     },
     { scope: titleRef }
