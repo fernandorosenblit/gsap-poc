@@ -42,11 +42,14 @@ export default function Hero() {
       .to(
         containerRef.current,
         {
+          motionPath: [
+            { x: 300, y: 100 },
+            { x: 200, y: 50 },
+            { x: 150, y: -50 },
+          ],
           bottom: 0,
           left: 0,
-          x: "70%",
-          y: "-10%",
-          width: "240px",
+          width: 240,
         },
         ">"
       );
