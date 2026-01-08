@@ -7,111 +7,156 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Keyframe animation configuration
+// Define animations as percentages (0-100) of video duration
+type KeyframeAnimation = {
+  selector: string;
+  keyframes: Array<{
+    at: number; // Percentage of video (0-100)
+    props: gsap.TweenVars;
+  }>;
+};
+
+const KEYFRAME_ANIMATIONS: KeyframeAnimation[] = [
+  {
+    selector: ".hero-title",
+    keyframes: [
+      {
+        at: 8.5, // 8.5% of video
+        props: {
+          opacity: 1,
+          visibility: "visible",
+          duration: 0.2,
+        },
+      },
+      {
+        at: 18.5, // 18.5% of video
+        props: {
+          opacity: 0,
+          visibility: "hidden",
+          duration: 0.2,
+        },
+      },
+    ],
+  },
+  {
+    selector: ".hero-tyres",
+    keyframes: [
+      {
+        at: 20, // 20% of video
+        props: {
+          opacity: 1,
+          visibility: "visible",
+          duration: 0.2,
+        },
+      },
+      {
+        at: 33, // 33% of video
+        props: {
+          opacity: 0,
+          visibility: "hidden",
+          duration: 0.2,
+        },
+      },
+    ],
+  },
+  {
+    selector: ".hero-chasis",
+    keyframes: [
+      {
+        at: 34, // 34% of video
+        props: {
+          opacity: 1,
+          visibility: "visible",
+          duration: 0.2,
+        },
+      },
+      {
+        at: 53, // 53% of video
+        props: {
+          opacity: 0,
+          visibility: "hidden",
+          duration: 0.2,
+        },
+      },
+    ],
+  },
+  {
+    selector: ".hero-engine",
+    keyframes: [
+      {
+        at: 54, // 54% of video
+        props: {
+          opacity: 1,
+          visibility: "visible",
+          duration: 0.2,
+        },
+      },
+      {
+        at: 79, // 79% of video
+        props: {
+          opacity: 0,
+          visibility: "hidden",
+          duration: 0.2,
+        },
+      },
+    ],
+  },
+  {
+    selector: ".hero-speed",
+    keyframes: [
+      {
+        at: 86, // 86% of video
+        props: {
+          opacity: 1,
+          visibility: "visible",
+          duration: 0.2,
+        },
+      },
+      {
+        at: 99, // 99% of video
+        props: {
+          opacity: 0,
+          visibility: "hidden",
+          duration: 0.2,
+        },
+      },
+    ],
+  },
+  {
+    selector: ".hero-video",
+    keyframes: [
+      {
+        at: 95, // 95% of video
+        props: {
+          maskSize: "5000%",
+        },
+      },
+      {
+        at: 99, // 100% of video
+        props: {
+          maskSize: "20%",
+        },
+      },
+    ],
+  },
+];
+
 export default function Video2() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
-  // Setup animations for text elements
-  // Add your show/hide animations here at specific times (in seconds)
+  // Setup animations using keyframes (percentages)
   const setupAnimations = useCallback(
     (timeline: gsap.core.Timeline, videoDuration: number) => {
-      timeline
-        .to(
-          ".hero-title",
-          {
-            opacity: 1,
-            visibility: "visible",
-            duration: 0.2,
-          },
-          0.65
-        )
-        .to(
-          ".hero-title",
-          {
-            opacity: 0,
-            visibility: "hidden",
-            duration: 0.2,
-          },
-          1.4
-        )
-        .to(
-          ".hero-tyres",
-          {
-            opacity: 1,
-            visibility: "visible",
-            duration: 0.2,
-          },
-          1.5
-        )
-        .to(
-          ".hero-tyres",
-          {
-            opacity: 0,
-            visibility: "hidden",
-            duration: 0.2,
-          },
-          2.5
-        )
-        .to(
-          ".hero-chasis",
-          {
-            opacity: 1,
-            visibility: "visible",
-            duration: 0.2,
-          },
-          2.6
-        )
-        .to(
-          ".hero-chasis",
-          {
-            opacity: 0,
-            visibility: "hidden",
-            duration: 0.2,
-          },
-          4
-        )
-        .to(
-          ".hero-engine",
-          {
-            opacity: 1,
-            visibility: "visible",
-            duration: 0.2,
-          },
-          4.1
-        )
-        .to(
-          ".hero-engine",
-          {
-            opacity: 0,
-            visibility: "hidden",
-            duration: 0.2,
-          },
-          6
-        )
-        .to(
-          ".hero-speed",
-          {
-            opacity: 1,
-            visibility: "visible",
-            duration: 0.2,
-          },
-          6.5
-        )
-        .to(
-          ".hero-speed",
-          {
-            opacity: 0,
-            visibility: "hidden",
-            duration: 0.2,
-          },
-          7.5
-        );
-
-      // Add your animations here:
-      // Use 'timeline' to add animations and 'videoDuration' to know the total video length
-      void timeline;
-      void videoDuration;
+      KEYFRAME_ANIMATIONS.forEach((animation) => {
+        animation.keyframes.forEach((keyframe) => {
+          // Convert percentage to timeline position (in seconds)
+          const position = (keyframe.at / 100) * videoDuration;
+          timeline.to(animation.selector, keyframe.props, position);
+        });
+      });
     },
     []
   );
@@ -184,7 +229,7 @@ export default function Video2() {
     <div ref={containerRef} id="video" className="w-screen h-screen relative">
       <video
         ref={videoRef}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover hero-video"
         muted
         playsInline
         preload="auto"
@@ -236,8 +281,8 @@ export default function Video2() {
           distinctive sound, compact design, and quick power delivery from low
           RPMs, optimizing performance and handling through a low center of
           gravity. Recent models (992.2 generation) incorporate elements from
-          higher-end models, like the Turbo's charge-air cooling, for enhanced
-          efficiency and power.
+          higher-end models, like the Turbo&apos;s charge-air cooling, for
+          enhanced efficiency and power.
         </p>
       </div>
       <div className="absolute top-7/8 -translate-y-1/2 left-1/2 -translate-x-1/2 flex flex-col hero-speed justify-center items-center initial-hidden">

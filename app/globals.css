@@ -29,4 +29,12 @@ body {
     opacity: 0;
     visibility: hidden;
   }
+
+  .hero-video {
+    mask-image: url("/images/logo-mask.png");
+    mask-size: 5000%;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    transition: mask-size 0.5s ease-in-out;
+  }
 }
