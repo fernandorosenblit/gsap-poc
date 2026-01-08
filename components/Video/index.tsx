@@ -1,23 +1,41 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, type RefObject } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Configurable timing for hero-title appearance
+// Animation configuration
+// Each entry defines when a component should appear/disappear
 // Values are between 0 and 1 (0% to 100% of scroll progress)
-const HERO_TITLE_CONFIG = {
-  appearAt: 0.06, // Title appears at 6% of scroll progress
-  disappearAt: 0.2, // Title disappears at 20% of scroll progress
+type AnimationConfig = {
+  selector: string | RefObject<HTMLElement>;
+  appearAt: number; // When to start appearing (0-1)
+  disappearAt: number; // When to start disappearing (0-1)
+  fadeDuration?: number; // Duration of fade in/out (default: 0.1)
 };
+
+const ANIMATION_CONFIG: AnimationConfig[] = [
+  {
+    selector: ".hero-title",
+    appearAt: 0.06, // 6% of scroll progress
+    disappearAt: 0.2, // 20% of scroll progress
+    fadeDuration: 0.1, // 10% fade transition
+  },
+  // Add more animations here:
+  // {
+  //   selector: ".another-element",
+  //   appearAt: 0.3,
+  //   disappearAt: 0.7,
+  //   fadeDuration: 0.15,
+  // },
+];
 
 export default function Video() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const heroTitleRef = useRef<HTMLHeadingElement>(null);
 
   const setupScrollTrigger = useCallback(() => {
     if (!videoRef.current || !containerRef.current) return;
@@ -27,61 +45,65 @@ export default function Video() {
 
     if (!duration) return;
 
-    // Create ScrollTrigger that pins until video ends
     // Calculate scroll distance: 100vh per second of video
     const scrollDistance = duration * window.innerHeight;
 
-    // Set initial state: hidden (only if heroTitleRef is available)
-    if (heroTitleRef.current) {
-      gsap.set(heroTitleRef.current, {
+    // Create timeline for all animations
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top top",
+        end: `+=${scrollDistance}`,
+        pin: true,
+        scrub: true,
+        onUpdate: (self) => {
+          // Update video currentTime based on scroll progress
+          const progress = self.progress;
+          video.currentTime = progress * duration;
+        },
+      },
+    });
+
+    // Set initial states and add animations to timeline
+    ANIMATION_CONFIG.forEach((config) => {
+      const element =
+        typeof config.selector === "string"
+          ? containerRef.current?.querySelector(config.selector)
+          : config.selector.current;
+
+      if (!element) return;
+
+      const fadeDuration = config.fadeDuration || 0.1;
+
+      // Set initial state: hidden
+      gsap.set(element, {
         opacity: 0,
         visibility: "hidden",
       });
-    }
 
-    ScrollTrigger.create({
-      trigger: containerRef.current,
-      start: "top top",
-      end: `+=${scrollDistance}`, // Pin for scroll distance based on video duration
-      pin: true,
-      scrub: true,
-      onUpdate: (self) => {
-        // Update video currentTime based on scroll progress
-        const progress = self.progress;
-        video.currentTime = progress * duration;
+      // Fade in at appearAt
+      tl.to(
+        element,
+        {
+          opacity: 1,
+          visibility: "visible",
+          duration: fadeDuration,
+          ease: "power2.out",
+        },
+        config.appearAt
+      );
 
-        // Control hero-title visibility based on progress (only if element exists)
-        if (heroTitleRef.current) {
-          const { appearAt, disappearAt } = HERO_TITLE_CONFIG;
-
-          if (progress >= appearAt && progress <= disappearAt) {
-            // Fade in/out with smooth transitions
-            let opacity = 1;
-
-            // Fade in at the start
-            if (progress < appearAt + 0.1) {
-              opacity = (progress - appearAt) / 0.1;
-            }
-            // Fade out at the end
-            else if (progress > disappearAt - 0.1) {
-              opacity = (disappearAt - progress) / 0.1;
-            }
-
-            gsap.to(heroTitleRef.current, {
-              opacity: opacity,
-              visibility: "visible",
-              duration: 0,
-            });
-          } else {
-            // Hide when outside the range
-            gsap.to(heroTitleRef.current, {
-              opacity: 0,
-              visibility: "hidden",
-              duration: 0,
-            });
-          }
-        }
-      },
+      // Fade out at disappearAt
+      tl.to(
+        element,
+        {
+          opacity: 0,
+          visibility: "hidden",
+          duration: fadeDuration,
+          ease: "power2.in",
+        },
+        config.disappearAt - fadeDuration
+      );
     });
   }, []);
 
@@ -111,10 +133,7 @@ export default function Video() {
         onLoadedMetadata={setupScrollTrigger}
       />
       <div className="max-w-[500px] mx-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-4 items-center justify-center">
-        <h2
-          ref={heroTitleRef}
-          className="text-black text-[100px] leading-[100px] tracking-[-4px] hero-title"
-        >
+        <h2 className="text-black text-[100px] leading-[100px] tracking-[-4px] hero-title">
           Carrera
         </h2>
         {/* <p className="text-white text-[17px] leading-[16.49px] tracking-[-0.68px] text-center">

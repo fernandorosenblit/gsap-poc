@@ -23,3 +23,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-ropa-sans), sans-serif;
 }
+
+@layer utilities {
+  .initial-hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
