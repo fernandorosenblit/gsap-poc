@@ -127,13 +127,13 @@ const KEYFRAME_ANIMATIONS: KeyframeAnimation[] = [
     selector: ".hero-video",
     keyframes: [
       {
-        at: 95, // 95% of video
+        at: 92, // 95% of video
         props: {
           maskSize: "5000%",
         },
       },
       {
-        at: 99, // 100% of video
+        at: 95, // 100% of video
         props: {
           maskSize: "20%",
         },
@@ -173,6 +173,13 @@ export default function Video2() {
 
     // Calculate scroll distance: 100vh per second of video
     const scrollDistance = duration * window.innerHeight;
+    // Add 20% of viewport height after video ends
+    const extraScrollDistance = 1.2 * window.innerHeight;
+    const totalScrollDistance = scrollDistance + extraScrollDistance;
+
+    // Calculate the progress point where video reaches 100%
+    // This is the ratio of video scroll to total scroll
+    const videoEndProgress = scrollDistance / totalScrollDistance;
 
     // Create animation timeline with the same duration as video
     // This timeline will be synced with ScrollTrigger progress
@@ -187,21 +194,26 @@ export default function Video2() {
     // Setup animations - add your show/hide animations here
     setupAnimations(animationTimeline, duration);
 
-    // Create ScrollTrigger that pins until video ends
+    // Create ScrollTrigger that pins until video ends + 20% extra
     const st = ScrollTrigger.create({
       trigger: containerRef.current,
       start: "top top",
-      end: `+=${scrollDistance}`, // Pin for scroll distance based on video duration
+      end: `+=${totalScrollDistance}`, // Pin for video duration + 20% extra
       pin: true,
       scrub: true,
       onUpdate: (self) => {
-        // Update video currentTime based on scroll progress
-        const progress = self.progress;
-        video.currentTime = progress * duration;
+        // Calculate progress: 0-1 over total scroll distance
+        const totalProgress = self.progress;
 
-        // Sync animation timeline with scroll progress
-        // Progress (0-1) * duration = time in seconds
-        animationTimeline.progress(progress);
+        // Calculate video progress: 0-1 based on when video should end
+        // When totalProgress reaches videoEndProgress, videoProgress should be 1
+        const videoProgress = Math.min(totalProgress / videoEndProgress, 1);
+
+        // Update video currentTime based on video progress (only up to 100%)
+        video.currentTime = videoProgress * duration;
+
+        // Sync animation timeline with video progress (clamped to 1)
+        animationTimeline.progress(videoProgress);
       },
     });
 

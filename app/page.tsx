@@ -14,7 +14,7 @@ export default function Home() {
     <section className="w-full max-w-screen overflow-x-hidden">
       <Hero />
       <Video2 />
-      <Hero />
+      <section className="w-screen h-screen bg-black" />
     </section>
   );
 }
