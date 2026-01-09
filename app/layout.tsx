@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Ropa_Sans } from "next/font/google";
 import "./globals.css";
+import LenisScrollProvider from "@/providers/LenisProvider";
 
 const ropaSans = Ropa_Sans({
   variable: "--font-ropa-sans",
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${ropaSans.variable} antialiased`}>{children}</body>
+      <body className={`${ropaSans.variable} antialiased`}>
+        <LenisScrollProvider>{children as JSX.Element}</LenisScrollProvider>
+      </body>
     </html>
   );
 }
